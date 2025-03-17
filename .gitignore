@@ -178,6 +178,7 @@ cython_debug/
 cleaned_data/
 torqueLogs
 torqueLogs.7z
+figures/
 
 # Models
 *.pth
