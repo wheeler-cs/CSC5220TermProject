@@ -16,6 +16,7 @@ data.replace('-', np.nan, inplace=True)
 data = data[["Speed (OBD)(mph)", "Miles Per Gallon(Instant)(mpg)"]]
 data = data.apply(pd.to_numeric, errors='coerce')
 data = data.dropna()
+data = data[data["Miles Per Gallon(Instant)(mpg)"] < 512]
 
 # Convert speed to an integer for better grouping
 data["Speed (OBD)(mph)"] = data["Speed (OBD)(mph)"].astype(int)
@@ -31,4 +32,5 @@ plt.ylabel("Average Miles Per Gallon (mpg)")
 plt.title("MPG vs. Speed")
 plt.grid(True)
 plt.legend()
+plt.savefig("figures/speed_vs_mpg.png")
 plt.show()
