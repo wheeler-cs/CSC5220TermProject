@@ -5,7 +5,7 @@ import pandas as pd
 
 
 # Set the minimum number of rows required for a file to be processed
-MIN_ROWS = 10
+MIN_ROWS = 15
 
 # Define input and output directories
 input_folder = "torqueLogs"
@@ -35,7 +35,7 @@ if __name__ == '__main__':
         "Relative Throttle Position(%)", "Speed (GPS)(mph)", "Speed (OBD)(mph)",
         "Trip average MPG(mpg)"
     ]
-
+    max_fuel_used = -1
     # Process each CSV file
     for filename in os.listdir(input_folder):
         if filename.endswith(".csv"):
@@ -72,12 +72,18 @@ if __name__ == '__main__':
             except Exception as ex:
                 print(ex)
                 raise
-            fuel_next = pd.concat((pd.Series(float(0)), fuel_next), ignore_index=True)
+            # If more than an ounce of fuel is used in the first row, duplicate the first value
+            if fuel_next.iloc[0] > 0.008:
+                fuel_next = pd.concat((pd.Series(fuel_next.iloc[0]), fuel_next), ignore_index=True)
+            else:
+                fuel_next = pd.concat((pd.Series(float(0)), fuel_next), ignore_index=True)
             try:
                 df["Fuel used (inst)"] = np.abs(fuel_next - df["Fuel used (trip)(gal)"].astype(float))
             except Exception as ex:
                 print(ex)
                 raise
+            if (x := max(df["Fuel used (inst)"])) > max_fuel_used:
+                max_fuel_used = x
 
             # Save the cleaned data
             output_path = os.path.join(output_folder, filename)
@@ -86,4 +92,5 @@ if __name__ == '__main__':
 
     end = time.perf_counter()
     print("Cleaning complete.")
+    print(f"Max fuel used: {max_fuel_used}")
     print(f"Time: {end - start:.4f}s")
