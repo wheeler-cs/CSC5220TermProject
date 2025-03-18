@@ -26,12 +26,14 @@ if __name__ == '__main__':
     start = time.perf_counter()
     # Define the columns to keep (trimmed version)
     columns_to_keep = [
-        "GPS Time", "Device Time", "Longitude", "Latitude", "GPS Speed (Meters/second)",
-        "Altitude", "Bearing", "G(x)", "G(y)", "G(z)",
-        "G(calibrated)", "Air Fuel Ratio(Measured)(:1)", "Engine Load(%)",
-        "Engine Load(Absolute)(%)", "Engine RPM(rpm)", "Fuel used (trip)(gal)", "GPS Altitude(ft)",
-        "GPS vs OBD Speed difference(mph)", "Intake Air Temperature(°F)", "Miles Per Gallon(Instant)(mpg)",
-        "Relative Throttle Position(%)", "Speed (GPS)(mph)", "Speed (OBD)(mph)", "Trip average MPG(mpg)"
+        "GPS Time", "Device Time", "Longitude", "Latitude",
+        "GPS Speed (Meters/second)", "Altitude", "Bearing", "G(x)", "G(y)",
+        "G(z)", "G(calibrated)", "Air Fuel Ratio(Measured)(:1)", "Engine Load(%)",
+        "Engine Load(Absolute)(%)", "Engine RPM(rpm)", "Fuel used (trip)(gal)",
+        "GPS Altitude(ft)", "GPS vs OBD Speed difference(mph)",
+        "Intake Air Temperature(°F)", "Miles Per Gallon(Instant)(mpg)",
+        "Relative Throttle Position(%)", "Speed (GPS)(mph)", "Speed (OBD)(mph)",
+        "Trip average MPG(mpg)"
     ]
 
     # Process each CSV file
@@ -71,9 +73,8 @@ if __name__ == '__main__':
                 print(ex)
                 raise
             fuel_next = pd.concat((pd.Series(float(0)), fuel_next), ignore_index=True)
-            # fuel_next._append(pd.Series(float(df["Fuel used (trip)(gal)"].iloc[-1])), ignore_index=True)
             try:
-                df["Fuel used (inst)"] = fuel_next - df["Fuel used (trip)(gal)"].astype(float)
+                df["Fuel used (inst)"] = np.abs(fuel_next - df["Fuel used (trip)(gal)"].astype(float))
             except Exception as ex:
                 print(ex)
                 raise
