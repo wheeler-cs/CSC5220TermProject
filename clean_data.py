@@ -24,7 +24,7 @@ if __name__ == '__main__':
     os.makedirs(output_folder, exist_ok=True)
 
     start = time.perf_counter()
-    # Define the columns to keep (trimmed version)
+    # Define the columns to keep (a trimmed version)
     columns_to_keep = [
         "GPS Time", "Device Time", "Longitude", "Latitude",
         "GPS Speed (Meters/second)", "Altitude", "Bearing", "G(x)", "G(y)",
@@ -36,6 +36,8 @@ if __name__ == '__main__':
         "Trip average MPG(mpg)"
     ]
     max_fuel_used = -1
+    # Just to see how many we have
+    num_data_points = 0
     # Process each CSV file
     for filename in os.listdir(input_folder):
         if filename.endswith(".csv"):
@@ -85,12 +87,17 @@ if __name__ == '__main__':
             if (x := max(df["Fuel used (inst)"])) > max_fuel_used:
                 max_fuel_used = x
 
-            # Save the cleaned data
+            df = df[df["GPS Time"] != '-']
+            df.reset_index()
+
+            # Save the cleaned hist_data
             output_path = os.path.join(output_folder, filename)
             df.to_csv(output_path, index=False)
+            num_data_points += len(df["Latitude"])
             print(f"Processed {filename}: {len(df)} rows saved.")
 
     end = time.perf_counter()
     print("Cleaning complete.")
     print(f"Max fuel used: {max_fuel_used}")
+    print(f"Number of data points: {num_data_points}")
     print(f"Time: {end - start:.4f}s")
