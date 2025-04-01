@@ -8,17 +8,24 @@ from torch.utils.data import Dataset
 
 class VehicleDataset(Dataset):
     """
-    Dataset class for vehicle fuel economy data.
+    Dataset class for vehicle fuel economy hist_data.
     """
+
     def __init__(self, data_dir, sequence_length=30):
         """
-        :param data_dir: The directory with the cleaned fuel economy data.
+        :param data_dir: The directory with the cleaned fuel economy hist_data.
         :param sequence_length: The size of the prediction being done.
         """
         self.sequence_length = sequence_length
         self.data = self.load_data(data_dir)
 
-    def load_data(self, data_dir):
+    @staticmethod
+    def load_data(data_dir):
+        """
+        Loads CSV hist_data from `data_dir`
+        :param data_dir: The directory with the cleaned hist_data CSVs.
+        :returns: The numpy arrays of the hist_data.
+        """
         all_files = [os.path.join(data_dir, f) for f in os.listdir(data_dir) if f.endswith('.csv')]
         dataframes = [pd.read_csv(f) for f in all_files]
         data = pd.concat(dataframes, ignore_index=True)
@@ -40,14 +47,21 @@ class VehicleDataset(Dataset):
         # Extract only what we want
         data = data[all_features]
 
-        # Make the strings into numbers, replacing missing data with nans.
+        # Make the strings into numbers, replacing missing hist_data with nans.
         data.replace('-', np.nan, inplace=True)
+        # Convert the string hist_data to float64 for some math
         data = data.apply(pd.to_numeric, errors='coerce')
+        # Drop rows with missing hist_data
         data = data.dropna()
 
-        # Scale the fuel used from gallons to ounces
-        data["Fuel used (inst)"] = data["Fuel used (inst)"] * 128
+        for column in data.columns:
+            # Min-Max Normalize each column.
+            data[column] = (
+                    (data[column] - np.min(data[column])) /
+                    (np.max(data[column]) - np.min(data[column]))
+            )
 
+        # Cast to float32 for training
         X = data[input_features].astype(np.float32).values
         y = data[target_features].astype(np.float32).values
         return X, y
