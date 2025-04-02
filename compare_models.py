@@ -20,6 +20,8 @@ models = [
     (32, 4, "checkpoint_4711_32_4.pth"),
     (64, 4, "checkpoint_4777_64_4.pth"),
     (128, 4, "checkpoint_4694_128_4.pth"),
+    (256, 4, "checkpoint_4578_256_4.pth"),
+    (512, 4, "checkpoint_4726_512_4.pth"),
 ]
 
 # Define model parameters

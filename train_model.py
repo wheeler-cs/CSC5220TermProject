@@ -15,7 +15,7 @@ from data_loading.vehicle_dataset import VehicleDataset
 
 # Load dataset
 data_dir = "cleaned_data"
-sequence_length = 30
+sequence_length = 10
 dataset = VehicleDataset(data_dir, sequence_length=sequence_length)
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size
@@ -26,8 +26,8 @@ dataloader_val = DataLoader(val_dataset, batch_size=128, shuffle=False)
 
 # Define model parameters
 input_size = 8  # Number of input features
-hidden_size = 16
-num_layers = 2
+hidden_size = 8
+num_layers = 4
 output_size = 2  # Predicting 2 variables
 
 print(f"Params\n"
@@ -46,6 +46,8 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 epochs = 100
 gpu_time = 0
 max_r2 = float("-inf")
+max_r2_train = float("-inf")
+
 for epoch in range(epochs):
     start = time.perf_counter()
     model.train()
@@ -97,12 +99,16 @@ for epoch in range(epochs):
     r2_train = r2_score(train_targets, train_preds)
 
     print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss_total:.4f}, Val Loss: {val_loss:.4f}, RMSE: {rmse:.4f}, "
-          f"MAE: {mae:.4f}, R²: {r2:.4f}, R² train: {r2_train:.4f}, R² max: {max_r2:.4f}")
+          f"MAE: {mae:.4f}, R²: {r2:.4f}, R² train: {r2_train:.4f}, R² max: {max_r2:.4f}, "
+          f"R² train max: {max_r2_train:.4f}")
     gpu_time += end - start
     # For TQDM
     time.sleep(0.01)
     if r2 > max_r2:
         max_r2 = r2
+        torch.save(model, "checkpoint.pth")
+    elif r2_train > max_r2_train:
+        max_r2_train = r2_train
         torch.save(model, "checkpoint.pth")
 
 print("Training complete.")
