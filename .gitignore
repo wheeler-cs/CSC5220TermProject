@@ -169,3 +169,17 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# IDE Stuff
+.vscode/
+.idea/
+
+# Data
+cleaned_data/
+torqueLogs
+torqueLogs.7z
+figures/
+*.sqlite
+
+# Models
+*.pth
