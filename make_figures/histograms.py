@@ -1,8 +1,12 @@
+"""
+Creates histograms of various variables
+"""
 import os
 import re
-import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+
+from .load_data import load_data
 
 
 def create_histogram(hist_data: pd.DataFrame, column: str, hist_filename: str):
@@ -29,9 +33,11 @@ def create_histogram(hist_data: pd.DataFrame, column: str, hist_filename: str):
     plt.close()
 
 
-if __name__ == '__main__':
-    # Load and preprocess CSV files
-    data_dir = "cleaned_data"
+def make_histograms():
+    """
+    Creates histograms of various variables
+    """
+    data = load_data()
     columns_to_plot = [
         "Intake Air Temperature(°F)",
         "Miles Per Gallon(Instant)(mpg)",
@@ -40,14 +46,7 @@ if __name__ == '__main__':
         "Engine RPM(rpm)",
         "Fuel used (inst)",
     ]
-    all_files = [os.path.join(data_dir, f) for f in os.listdir(data_dir) if f.endswith('.csv')]
-    dataframes = [pd.read_csv(f) for f in all_files]
-    data = pd.concat(dataframes, ignore_index=True)
 
-    # Clean hist_data
-    data.columns = data.columns.str.strip()
-    data = data.map(lambda x: str(x).strip() if isinstance(x, str) else x)
-    data.replace('-', np.nan, inplace=True)
     # Include all three target columns in preprocessing
     data = data[columns_to_plot]
     data = data.apply(pd.to_numeric, errors='coerce')
