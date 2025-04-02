@@ -1,22 +1,25 @@
+"""
+Train the model with particular hyperparameters
+"""
 import time
 
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.metrics import mean_absolute_error, r2_score
 import torch
-import torch.nn as nn
-import torch.optim as optim
+from torch import nn
+from torch import optim
 from torch.utils.data import DataLoader, random_split
 from tqdm import tqdm
-from sklearn.metrics import mean_absolute_error, r2_score
 
 from mpg_rnn.fuel_mpg_rnn import FuelMPGRNN
 from data_loading.vehicle_dataset import VehicleDataset
 
 
 # Load dataset
-data_dir = "cleaned_data"
-sequence_length = 10
-dataset = VehicleDataset(data_dir, sequence_length=sequence_length)
+DATA_DIR = "cleaned_data"
+SEQUENCE_LENGTH = 10
+dataset = VehicleDataset(DATA_DIR, sequence_length=SEQUENCE_LENGTH)
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
@@ -25,34 +28,34 @@ dataloader_train = DataLoader(train_dataset, batch_size=128, shuffle=True)
 dataloader_val = DataLoader(val_dataset, batch_size=128, shuffle=False)
 
 # Define model parameters
-input_size = 8  # Number of input features
-hidden_size = 8
-num_layers = 4
-output_size = 2  # Predicting 2 variables
+INPUT_SIZE = 8  # Number of input features
+HIDDEN_SIZE = 8
+NUM_LAYERS = 4
+OUTPUT_SIZE = 2  # Predicting 2 variables
 
 print(f"Params\n"
-      f"{input_size=}\n"
-      f"{hidden_size=}\n"
-      f"{num_layers=}\n"
-      f"{output_size=}\n")
+      f"{INPUT_SIZE=}\n"
+      f"{HIDDEN_SIZE=}\n"
+      f"{NUM_LAYERS=}\n"
+      f"{OUTPUT_SIZE=}\n")
 
 # Initialize model, loss, and optimizer
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = FuelMPGRNN(input_size, hidden_size, num_layers, output_size).to(device)
+model = FuelMPGRNN(INPUT_SIZE, HIDDEN_SIZE, NUM_LAYERS, OUTPUT_SIZE).to(device)
 criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 # Training loop
-epochs = 100
-gpu_time = 0
+EPOCHS = 100
+GPU_TIME = 0
 max_r2 = float("-inf")
 max_r2_train = float("-inf")
 
-for epoch in range(epochs):
+for epoch in range(EPOCHS):
     start = time.perf_counter()
     model.train()
     progress_bar = tqdm(total=len(dataloader_train), initial=1, desc="Train")
-    loss_total = 0
+    LOSS_TOTAL = 0
     train_targets = []
     train_preds = []
     for inputs, targets in dataloader_train:
@@ -63,14 +66,14 @@ for epoch in range(epochs):
         train_targets.append(targets.cpu().numpy())
         train_preds.append(outputs.detach().cpu().numpy())
         loss = criterion(outputs, targets)
-        loss_total += loss.item()
+        LOSS_TOTAL += loss.item()
         loss.backward()
         optimizer.step()
         progress_bar.update(1)
     progress_bar.close()
     # Validation phase
     model.eval()
-    val_loss = 0
+    VAL_LOSS = 0
     all_targets = []
     all_preds = []
     progress_bar = tqdm(total=len(dataloader_val), initial=1, desc="Eval")
@@ -78,11 +81,11 @@ for epoch in range(epochs):
         for inputs, targets in dataloader_val:
             inputs, targets = inputs.to(device), targets.to(device)
             outputs = model(inputs)
-            val_loss += criterion(outputs, targets).item()
+            VAL_LOSS += criterion(outputs, targets).item()
             all_targets.append(targets.cpu().numpy())
             all_preds.append(outputs.cpu().numpy())
             progress_bar.update(1)
-    val_loss /= len(dataloader_val)
+    VAL_LOSS /= len(dataloader_val)
     progress_bar.close()
     end = time.perf_counter()
 
@@ -98,10 +101,16 @@ for epoch in range(epochs):
     r2 = r2_score(all_targets, all_preds)
     r2_train = r2_score(train_targets, train_preds)
 
-    print(f"Epoch {epoch + 1}/{epochs}, Loss: {loss_total:.4f}, Val Loss: {val_loss:.4f}, RMSE: {rmse:.4f}, "
-          f"MAE: {mae:.4f}, R²: {r2:.4f}, R² train: {r2_train:.4f}, R² max: {max_r2:.4f}, "
+    print(f"Epoch {epoch + 1}/{EPOCHS}, "
+          f"Loss: {LOSS_TOTAL:.4f}, "
+          f"Val Loss: {VAL_LOSS:.4f}, "
+          f"RMSE: {rmse:.4f}, "
+          f"MAE: {mae:.4f}, "
+          f"R²: {r2:.4f}, "
+          f"R² train: {r2_train:.4f}, "
+          f"R² max: {max_r2:.4f}, "
           f"R² train max: {max_r2_train:.4f}")
-    gpu_time += end - start
+    GPU_TIME += end - start
     # For TQDM
     time.sleep(0.01)
     if r2 > max_r2:
@@ -112,7 +121,7 @@ for epoch in range(epochs):
         torch.save(model, "checkpoint.pth")
 
 print("Training complete.")
-print(f"GPU time: {gpu_time:.4f}s")
+print(f"GPU time: {GPU_TIME:.4f}s")
 
 # Plot for Trip Average MPG
 plt.figure(figsize=(8, 5))

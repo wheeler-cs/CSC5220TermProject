@@ -1,3 +1,6 @@
+"""
+Clean the data from Torque
+"""
 import os
 import time
 import numpy as np
@@ -8,26 +11,31 @@ import pandas as pd
 MIN_ROWS = 15
 
 # Define input and output directories
-input_folder = "torqueLogs"
-output_folder = "cleaned_data"
+INPUT_FOLDER = "torqueLogs"
+OUTPUT_FOLDER = "cleaned_data"
 
 
-def is_a_float(x):
+def is_a_float(potential_float: str) -> bool:
+    """
+    Attempts to convert the input to a floating point, returning the success of this.
+    :param potential_float: The value to attempt to convert.
+    :return: Success of conversion.
+    """
     try:
-        float(x)
+        float(potential_float)
         return True
     except ValueError:
         return False
 
 
 if __name__ == '__main__':
-    os.makedirs(output_folder, exist_ok=True)
+    os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
     start = time.perf_counter()
     # Define the columns to keep (a trimmed version)
     columns_to_keep = [
         "GPS Time", "Device Time", "Longitude", "Latitude",
-        "GPS Speed (Meters/second)", "Altitude", "Bearing", "G(x)", "G(y)",
+        "GPS Speed (Meters/second)", "Altitude", "Bearing", "G(potiential_float)", "G(y)",
         "G(z)", "G(calibrated)", "Air Fuel Ratio(Measured)(:1)", "Engine Load(%)",
         "Engine Load(Absolute)(%)", "Engine RPM(rpm)", "Fuel used (trip)(gal)",
         "GPS Altitude(ft)", "GPS vs OBD Speed difference(mph)",
@@ -35,13 +43,14 @@ if __name__ == '__main__':
         "Relative Throttle Position(%)", "Speed (GPS)(mph)", "Speed (OBD)(mph)",
         "Trip average MPG(mpg)"
     ]
+    # pylint: disable=invalid-name
     max_fuel_used = -1
     # Just to see how many we have
     num_data_points = 0
     # Process each CSV file
-    for filename in os.listdir(input_folder):
+    for filename in os.listdir(INPUT_FOLDER):
         if filename.endswith(".csv"):
-            file_path = os.path.join(input_folder, filename)
+            file_path = os.path.join(INPUT_FOLDER, filename)
             df = pd.read_csv(file_path)
 
             # Trim spaces from column names
@@ -80,7 +89,9 @@ if __name__ == '__main__':
             else:
                 fuel_next = pd.concat((pd.Series(float(0)), fuel_next), ignore_index=True)
             try:
-                df["Fuel used (inst)"] = np.abs(fuel_next - df["Fuel used (trip)(gal)"].astype(float))
+                df["Fuel used (inst)"] = np.abs(
+                    fuel_next - df["Fuel used (trip)(gal)"].astype(float)
+                )
             except Exception as ex:
                 print(ex)
                 raise
@@ -91,7 +102,7 @@ if __name__ == '__main__':
             df.reset_index()
 
             # Save the cleaned hist_data
-            output_path = os.path.join(output_folder, filename)
+            output_path = os.path.join(OUTPUT_FOLDER, filename)
             df.to_csv(output_path, index=False)
             num_data_points += len(df["Latitude"])
             print(f"Processed {filename}: {len(df)} rows saved.")

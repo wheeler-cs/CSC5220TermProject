@@ -3,13 +3,13 @@ Plots (weather) temperature against MPG
 """
 import pandas as pd
 import matplotlib.pyplot as plt
-
+# pylint: disable=relative-beyond-top-level
 from .load_data import load_data
 
 
 def make_weather_mpg():
     """
-    Plots (weather) temperature against MPG
+    Plots (weather) temperature (°C) against MPG
     """
     data = load_data()
     data = data[["Temperature (°C)", "Miles Per Gallon(Instant)(mpg)"]]
@@ -22,7 +22,14 @@ def make_weather_mpg():
 
     # Plot Speed vs. MPG
     plt.figure(figsize=(10, 5))
-    plt.plot(grouped.index, grouped.values, marker='o', linestyle='-', color='b', label="Average MPG")
+    plt.plot(
+        grouped.index,
+        grouped.values,
+        marker='o',
+        linestyle='-',
+        color='b',
+        label="Average MPG"
+    )
     plt.xlabel("Temperature (°C)")
     plt.ylabel("Average Miles Per Gallon (mpg)")
     plt.title("Temperature (°C) vs. Miles Per Gallon (mpg)")
@@ -32,6 +39,9 @@ def make_weather_mpg():
 
 
 def make_weather_mpg_fahrenheit():
+    """
+    Plots (weather) temperature (°F) against MPG
+    """
     data = load_data()
     data = data[["Temperature (°C)", "Miles Per Gallon(Instant)(mpg)"]]
     data = data.apply(pd.to_numeric, errors='coerce')
@@ -44,7 +54,14 @@ def make_weather_mpg_fahrenheit():
 
     # Plot Speed vs. MPG
     plt.figure(figsize=(10, 5))
-    plt.plot(grouped.index, grouped.values, marker='o', linestyle='-', color='b', label="Average MPG")
+    plt.plot(
+        grouped.index,
+        grouped.values,
+        marker='o',
+        linestyle='-',
+        color='b',
+        label="Average MPG"
+    )
     plt.xlabel("Temperature (°F)")
     plt.ylabel("Average Miles Per Gallon (mpg)")
     plt.title("Temperature (°F) vs. Miles Per Gallon (mpg)")

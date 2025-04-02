@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.interpolate import griddata
-
+# pylint: disable=relative-beyond-top-level
 from .load_data import load_data
 
 
@@ -14,7 +14,12 @@ def make_temp_speed_mpg():
     Plots intake air temperature against MPG
     """
     data = load_data()
-    data = data[["Speed (OBD)(mph)", "Intake Air Temperature(°F)", "Miles Per Gallon(Instant)(mpg)"]]
+    data = data[
+        ["Speed (OBD)(mph)",
+         "Intake Air Temperature(°F)",
+         "Miles Per Gallon(Instant)(mpg)"
+         ]
+    ]
     data = data.apply(pd.to_numeric, errors='coerce')
     data = data.dropna()
     data = data[data["Miles Per Gallon(Instant)(mpg)"] < 512]

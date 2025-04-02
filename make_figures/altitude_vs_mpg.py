@@ -24,7 +24,14 @@ def make_altitude_plot():
 
     # Plot Speed vs. MPG
     plt.figure(figsize=(10, 5))
-    plt.plot(grouped.index, grouped.values, marker='o', linestyle='-', color='b', label="Average MPG")
+    plt.plot(
+        grouped.index,
+        grouped.values,
+        marker='o',
+        linestyle='-',
+        color='b',
+        label="Average MPG"
+    )
     plt.xlabel("Altitude")
     plt.ylabel("Average Miles Per Gallon (mpg)")
     plt.title("Altitude vs. Miles Per Gallon (mpg)")

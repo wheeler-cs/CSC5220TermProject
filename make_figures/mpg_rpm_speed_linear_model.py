@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_squared_error
-
+# pylint: disable=relative-beyond-top-level
 from .load_data import load_data
 
 
@@ -26,12 +26,12 @@ def make_mpg_rpm_linear_model():
     # Transform speed using square root
     data["sqrt_speed"] = np.sqrt(data["Speed (OBD)(mph)"])
 
-    # Define X (independent variables: sqrt(speed) and RPM) and y (dependent variable: MPG)
-    X = data[["sqrt_speed", "Engine RPM(rpm)"]].values
+    # Define x (sqrt(speed) and RPM) and y (MPG)
+    x = data[["sqrt_speed", "Engine RPM(rpm)"]].values
     y = data["Miles Per Gallon(Instant)(mpg)"].values
 
     # Train a multiple linear regression model
-    model = LinearRegression().fit(X, y)
+    model = LinearRegression().fit(x, y)
 
     # Get coefficients and intercept
     coefficients = model.coef_
@@ -40,7 +40,7 @@ def make_mpg_rpm_linear_model():
     print(f"Intercept: {intercept:.4f}")
 
     # Make predictions for MPG
-    y_pred = model.predict(X)
+    y_pred = model.predict(x)
 
     # Calculate performance metrics
     r2 = r2_score(y, y_pred)

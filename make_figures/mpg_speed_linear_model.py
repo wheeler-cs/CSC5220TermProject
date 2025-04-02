@@ -6,7 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import r2_score, mean_squared_error
-
+# pylint: disable=relative-beyond-top-level
 from .load_data import load_data
 
 
@@ -29,19 +29,19 @@ def make_mpg_linear_model():
     data["sqrt_speed"] = np.sqrt(data["Speed (OBD)(mph)"])
 
     # Define X and y
-    X = data[["sqrt_speed"]].values  # Independent variable (reshaped for sklearn)
+    x = data[["sqrt_speed"]].values  # Independent variable (reshaped for sklearn)
     y = data["Miles Per Gallon(Instant)(mpg)"].values  # Dependent variable
 
     # Train linear model
     model = LinearRegression()
-    model.fit(X, y)
+    model.fit(x, y)
     m = model.coef_[0]
     b = model.intercept_
     print(f"m: {m}\n"
           f"b: {b}")
 
     # Predictions
-    y_pred = model.predict(X)
+    y_pred = model.predict(x)
 
     # Calculate R² score and Mean Squared Error (MSE)
     r2 = r2_score(y, y_pred)

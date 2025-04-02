@@ -1,18 +1,21 @@
+"""
+Compare some given models
+"""
 import numpy as np
 import torch
-import torch.nn as nn
+from torch import nn
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from sklearn.metrics import mean_absolute_error, r2_score
-
+# pylint: disable=import-error
 from mpg_rnn.fuel_mpg_rnn import FuelMPGRNN
 from data_loading.vehicle_dataset import VehicleDataset
 
 
 # Load dataset
-data_dir = "cleaned_data"
-sequence_length = 30
-dataset = VehicleDataset(data_dir, sequence_length=sequence_length)
+DATA_DIR = "cleaned_data"
+SEQUENCE_LENGTH = 10
+dataset = VehicleDataset(DATA_DIR, sequence_length=SEQUENCE_LENGTH)
 eval_dataset = DataLoader(dataset, batch_size=128, shuffle=False)
 
 models = [
@@ -25,14 +28,14 @@ models = [
 ]
 
 # Define model parameters
-input_size = 8  # Number of input features
-output_size = 2  # Predicting 2 variables
+INPUT_SIZE = 8  # Number of input features
+OUTPUT_SIZE = 2  # Predicting 2 variables
 
 for h, n, m in models:
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = FuelMPGRNN(input_size, h, n, output_size).to(device)
+    model = FuelMPGRNN(INPUT_SIZE, h, n, OUTPUT_SIZE).to(device)
     criterion = nn.MSELoss()
-
+    # pylint: disable=invalid-name
     val_loss = 0
     all_targets = []
     all_preds = []

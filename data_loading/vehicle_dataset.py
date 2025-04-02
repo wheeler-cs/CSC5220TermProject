@@ -1,3 +1,6 @@
+"""
+Dataset class for vehicle fuel economy hist_data.
+"""
 import os
 
 import numpy as np
@@ -22,7 +25,7 @@ class VehicleDataset(Dataset):
     @staticmethod
     def load_data(data_dir):
         """
-        Loads CSV hist_data from `data_dir`
+        Loads CSV hist_data from `DATA_DIR`
         :param data_dir: The directory with the cleaned hist_data CSVs.
         :returns: The numpy arrays of the hist_data.
         """
@@ -62,14 +65,20 @@ class VehicleDataset(Dataset):
             )
 
         # Cast to float32 for training
-        X = data[input_features].astype(np.float32).values
+        x = data[input_features].astype(np.float32).values
         y = data[target_features].astype(np.float32).values
-        return X, y
+        return x, y
 
     def __len__(self):
+        """
+        The length of the dataset
+        """
         return len(self.data[0]) - self.sequence_length
 
     def __getitem__(self, idx):
-        X_seq = self.data[0][idx:idx + self.sequence_length]
+        """
+        Get a particular item of the dataset
+        """
+        x_seq = self.data[0][idx:idx + self.sequence_length]
         y_seq = self.data[1][idx + self.sequence_length - 1]  # Predict the last time step
-        return torch.tensor(X_seq), torch.tensor(y_seq)
+        return torch.tensor(x_seq), torch.tensor(y_seq)

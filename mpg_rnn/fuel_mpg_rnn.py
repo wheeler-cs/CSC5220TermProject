@@ -1,3 +1,6 @@
+"""
+LSTM RNN for fuel economy prediction
+"""
 from torch import nn
 
 
@@ -13,11 +16,14 @@ class FuelMPGRNN(nn.Module):
         :param num_layers: Number of recurrent layers.
         :param output_size: The number of outputs.
         """
-        super(FuelMPGRNN, self).__init__()
+        super().__init__()
         self.lstm = nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
         self.fc = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
+        """
+        Forward pass of the model
+        """
         lstm_out, _ = self.lstm(x)
         out = self.fc(lstm_out[:, -1, :])
         return out
