@@ -19,7 +19,7 @@ start = time.perf_counter()
 # Load dataset
 DATA_DIR = "cleaned_data"
 SEQUENCE_LENGTH = 10
-dataset = VehicleDataset(DATA_DIR, sequence_length=SEQUENCE_LENGTH)
+dataset = VehicleDataset(DATA_DIR, sequence_length=SEQUENCE_LENGTH, do_weather=True)
 
 # Hyperparameters to search
 hidden_sizes = [8, 16, 32, 64, 128, 256]
@@ -27,7 +27,7 @@ num_layers_list = [2, 4, 6]
 K_FOLDS = 5
 
 # Define model parameters
-INPUT_SIZE = 8  # Number of input features
+INPUT_SIZE = 9  # Number of input features
 OUTPUT_SIZE = 2  # Predicting 2 variables
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -50,8 +50,8 @@ for hidden_size in hidden_sizes:
             val_subset = Subset(dataset, val_idx)
             # The dataset is 567,793 long, so use a lot of memory for it and do 9 steps per epoch
             # as opposed to doing thousands of steps.
-            dataloader_train = DataLoader(train_subset, batch_size=65_536, shuffle=True)
-            dataloader_val = DataLoader(val_subset, batch_size=65_536, shuffle=False)
+            dataloader_train = DataLoader(train_subset, batch_size=1024, shuffle=True)
+            dataloader_val = DataLoader(val_subset, batch_size=1024, shuffle=False)
 
             # Initialize model
             model = FuelMPGRNN(INPUT_SIZE, hidden_size, num_layers, OUTPUT_SIZE).to(device)
@@ -111,11 +111,11 @@ for hidden_size in hidden_sizes:
 
 # Save stats to CSV
 stats_df = pd.DataFrame(stats_records)
-stats_df.to_csv("training_stats.csv", index=False)
+stats_df.to_csv("training_stats_weather.csv", index=False)
 end = time.perf_counter()
 print(f"Best model: "
-      f"HIDDEN_SIZE={best_params[0]}, "
-      f"NUM_LAYERS={best_params[1]} "
+      f"hidden_size={best_params[0]}, "
+      f"num_layers={best_params[1]} "
       f"with R²={best_r2:.4f}"
       )
 print(f"Time: {end - start}s")
