@@ -1,11 +1,18 @@
 """
 Clean the data from Torque
 """
+from datetime import datetime
 import os
 import time
+from typing import Tuple, Union
+
 import numpy as np
 import pandas as pd
+from requests_cache import CachedSession
 
+
+# Setup cache (expires after 30 days)
+session = CachedSession('weather_cache', expire_after=86400 * 30)
 
 # Set the minimum number of rows required for a file to be processed
 MIN_ROWS = 15
@@ -28,6 +35,97 @@ def is_a_float(potential_float: str) -> bool:
         return False
 
 
+def moving_average(arr: np.array, window_size: int = 599) -> np.array:
+    """
+    Calculates the moving average of an array over *n* elements.
+    :param arr: The NumPy array to average across.
+    :param window_size: The window for averaging.
+    :returns: The averaged array.
+    """
+    if window_size % 2 == 0:
+        raise ValueError("Window size must be odd to maintain the same element count.")
+
+    kernel = np.ones(window_size) / window_size
+    smoothed = np.convolve(arr, kernel, mode='same')
+    smoothed = np.round(smoothed, decimals=2)
+    return smoothed
+
+
+def parse_datetime(dt_str: str) -> Tuple[str, int]:
+    """
+    Parses the Torque datetime string into a date string and the hour.
+    :param dt_str: The datetime to be parsed.
+    :return: Tuple of date string (for the API) and the hour (for the index).
+    """
+    # Split string and remove the timezone (EDT)
+    parts = dt_str.split()
+    cleaned_dt_str = " ".join(parts[:4] + parts[5:])  # Removes the timezone part
+
+    # Convert to datetime object
+    dt_obj = datetime.strptime(cleaned_dt_str, "%a %b %d %H:%M:%S %Y")
+
+    return dt_obj.strftime("%Y-%m-%d"), dt_obj.hour  # Returns date and hour
+
+
+def get_weather(lat: str, lon: str, dt_str: str) -> Union[float, None]:
+    """
+    Gets weather data for the given location and time.
+    :param lat: The latitude.
+    :param lon: The longitude.
+    :param dt_str: The datetime string of the time.
+    :return: The temperature or None.
+    """
+    date, hour = parse_datetime(dt_str)
+
+    # Open-Meteo API URL
+    url = (f"https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lon}&"
+           f"start_date={date}&end_date={date}&hourly=temperature_2m")
+
+    response = session.get(url)  # Cached request
+    if response.status_code == 200:
+        data = response.json()
+        try:
+            return data["hourly"]["temperature_2m"][hour]  # Get the closest hour
+        except (KeyError, IndexError):
+            return None  # Handle missing data
+    return None  # API failure
+
+
+def add_weather(input_df: pd.DataFrame, max_calls: int = 10_000) -> pd.DataFrame:
+    """
+    Adds the weather data to the given CSV.
+    :param input_df: The dataframe to add weather data to.
+    :param max_calls: The maximum number of API calls to do for this file.
+    :returns: None.
+    """
+
+    call_count = 0
+    row_num = 0
+    temperature_series = pd.Series(dtype=float, name="Temperature (°C)")
+
+    for _, row in input_df.iterrows():
+        if row_num % 600 != 0:
+            row_num += 1
+            continue
+        if call_count >= max_calls:
+            print("Reached API limit, stopping.")
+            break  # Stop if we hit the daily limit
+
+        weather = get_weather(row["Latitude"], row["Longitude"], row["GPS Time"])
+        if weather is not None:
+            weather_list = [weather for _ in range(600)]
+            temperature_series = pd.concat((temperature_series, pd.Series(weather_list)))
+            call_count += 1
+            if call_count % 100 == 0:  # Avoid rate limits
+                time.sleep(1)
+        row_num += 1
+    temperature_series = np.array(temperature_series)
+    temperature_series = moving_average(temperature_series)
+    temperature_series = temperature_series[:(len(input_df["Latitude"]) - len(temperature_series))]
+    input_df["Temperature (°C)"] = temperature_series
+    return input_df
+
+
 if __name__ == '__main__':
     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
@@ -35,7 +133,7 @@ if __name__ == '__main__':
     # Define the columns to keep (a trimmed version)
     columns_to_keep = [
         "GPS Time", "Device Time", "Longitude", "Latitude",
-        "GPS Speed (Meters/second)", "Altitude", "Bearing", "G(potiential_float)", "G(y)",
+        "GPS Speed (Meters/second)", "Altitude", "Bearing", "G(x)", "G(y)",
         "G(z)", "G(calibrated)", "Air Fuel Ratio(Measured)(:1)", "Engine Load(%)",
         "Engine Load(Absolute)(%)", "Engine RPM(rpm)", "Fuel used (trip)(gal)",
         "GPS Altitude(ft)", "GPS vs OBD Speed difference(mph)",
@@ -100,6 +198,8 @@ if __name__ == '__main__':
 
             df = df[df["GPS Time"] != '-']
             df.reset_index()
+
+            df = add_weather(df)
 
             # Save the cleaned hist_data
             output_path = os.path.join(OUTPUT_FOLDER, filename)
