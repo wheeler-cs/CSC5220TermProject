@@ -45,6 +45,7 @@ def make_histograms():
     Creates histograms of various variables
     """
     data = load_data()
+    data["Temperature (°F)"] = data["Temperature (°C)"] * 9 / 5 + 32
     columns_to_plot = [
         "Intake Air Temperature(°F)",
         "Miles Per Gallon(Instant)(mpg)",
@@ -52,6 +53,8 @@ def make_histograms():
         "Engine Load(Absolute)(%)",
         "Engine RPM(rpm)",
         "Fuel used (inst)",
+        "Temperature (°C)",
+        "Temperature (°F)",
     ]
 
     # Include all three target columns in preprocessing
