@@ -46,9 +46,11 @@ def make_histograms():
     """
     data = load_data()
     data["Temperature (°F)"] = data["Temperature (°C)"] * 9 / 5 + 32
+    data["Speed (OBD)(kph)"] = data["Speed (OBD)(mph)"] * 1.609344
     columns_to_plot = [
         "Intake Air Temperature(°F)",
         "Miles Per Gallon(Instant)(mpg)",
+        "Speed (OBD)(kph)",
         "Speed (OBD)(mph)",
         "Engine Load(Absolute)(%)",
         "Engine RPM(rpm)",
