@@ -180,6 +180,9 @@ torqueLogs
 torqueLogs.7z
 figures/
 *.sqlite
+*.xls
+*.xlsx
+*.csv
 
 # Models
 *.pth
