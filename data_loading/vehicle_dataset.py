@@ -14,16 +14,17 @@ class VehicleDataset(Dataset):
     Dataset class for vehicle fuel economy hist_data.
     """
 
-    def __init__(self, data_dir, sequence_length=30):
+    def __init__(self, data_dir, sequence_length=30, do_weather: bool = False):
         """
         :param data_dir: The directory with the cleaned fuel economy hist_data.
         :param sequence_length: The size of the prediction being done.
+        :param do_weather: Whether to add weather data.
         """
         self.sequence_length = sequence_length
+        self.do_weather = do_weather
         self.data = self.load_data(data_dir)
 
-    @staticmethod
-    def load_data(data_dir):
+    def load_data(self, data_dir):
         """
         Loads CSV hist_data from `DATA_DIR`
         :param data_dir: The directory with the cleaned hist_data CSVs.
@@ -45,6 +46,8 @@ class VehicleDataset(Dataset):
             "Engine Load(%)", "Engine RPM(rpm)", "Intake Air Temperature(°F)",
             "Relative Throttle Position(%)", "Speed (OBD)(mph)"
         ]
+        if self.do_weather:
+            input_features.append("Temperature (°C)")
         target_features = ["Miles Per Gallon(Instant)(mpg)", "Fuel used (inst)"]
         all_features = input_features + target_features
         # Extract only what we want
