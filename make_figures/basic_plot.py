@@ -4,6 +4,7 @@ Makes a basic plot
 import matplotlib.pyplot as plt
 
 
+# pylint: disable=too-many-arguments,too-many-positional-arguments
 def basic_plot(
         x,
         y,

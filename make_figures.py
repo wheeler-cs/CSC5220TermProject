@@ -29,6 +29,7 @@ if __name__ == '__main__':
     ]
 
     # Make the figures
+    # pylint: disable=consider-using-with
     pool = multiprocessing.Pool(processes=8)
     for func in functions:
         pool.apply_async(func)

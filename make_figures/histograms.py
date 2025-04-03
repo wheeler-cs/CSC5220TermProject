@@ -6,7 +6,7 @@ import re
 from typing import Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
-
+# pylint: disable=relative-beyond-top-level
 from .load_data import load_data
 
 
@@ -14,7 +14,7 @@ def create_histogram(
         hist_data: pd.DataFrame,
         column: str,
         hist_filename: str,
-        size: Tuple[int, int]=(10, 5)
+        size: Tuple[int, int] = (10, 5)
 ) -> None:
     """
     Creates and saves a histogram for the specified column.
@@ -74,4 +74,3 @@ def make_histograms():
     filename = f"figures/histogram_{sanitized}.png"
     fuel_used_df = data[data["Fuel used (inst)"] < 0.0028]
     create_histogram(fuel_used_df, "Fuel used (inst)", filename, size=(10, 10))
-
