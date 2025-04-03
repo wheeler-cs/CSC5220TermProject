@@ -2,8 +2,8 @@
 Plots speed against MPG
 """
 import pandas as pd
-import matplotlib.pyplot as plt
 # pylint: disable=relative-beyond-top-level
+from .basic_plot import basic_plot
 from .load_data import load_data
 
 
@@ -23,19 +23,12 @@ def make_speed_mpg_plot():
     # Group by speed and compute average MPG
     grouped = data.groupby("Speed (OBD)(mph)")["Miles Per Gallon(Instant)(mpg)"].mean()
 
-    # Plot Speed vs. MPG
-    plt.figure(figsize=(10, 5))
-    plt.plot(
+    basic_plot(
         grouped.index,
         grouped.values,
-        marker='o',
-        linestyle='-',
-        color='b',
-        label="Average MPG"
+        "Average MPG",
+        "Speed (mph)",
+        "Average Miles Per Gallon (mpg)",
+        "MPG vs. Speed (MPH)",
+        "figures/speed_vs_mpg.png"
     )
-    plt.xlabel("Speed (mph)")
-    plt.ylabel("Average Miles Per Gallon (mpg)")
-    plt.title("MPG vs. Speed")
-    plt.grid(True)
-    plt.legend()
-    plt.savefig("figures/speed_vs_mpg.png")

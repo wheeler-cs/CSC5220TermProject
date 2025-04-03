@@ -2,7 +2,8 @@
 Makes the plot of altitude vs. MPG
 """
 import pandas as pd
-import matplotlib.pyplot as plt
+# pylint: disable=relative-beyond-top-level
+from .basic_plot import basic_plot
 from .load_data import load_data
 
 
@@ -22,19 +23,12 @@ def make_altitude_plot():
     # Group by speed and compute average MPG
     grouped = data.groupby("Altitude")["Miles Per Gallon(Instant)(mpg)"].mean()
 
-    # Plot Speed vs. MPG
-    plt.figure(figsize=(10, 5))
-    plt.plot(
+    basic_plot(
         grouped.index,
         grouped.values,
-        marker='o',
-        linestyle='-',
-        color='b',
-        label="Average MPG"
+        "Average MPG",
+        "Altitude",
+        "Average Miles Per Gallon (mpg)",
+        "Altitude vs. Miles Per Gallon (mpg)",
+        "figures/altitude_vs_mpg.png"
     )
-    plt.xlabel("Altitude")
-    plt.ylabel("Average Miles Per Gallon (mpg)")
-    plt.title("Altitude vs. Miles Per Gallon (mpg)")
-    plt.grid(True)
-    plt.legend()
-    plt.savefig("figures/altitude_vs_mpg.png")
