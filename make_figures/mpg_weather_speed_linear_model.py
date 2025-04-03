@@ -1,5 +1,5 @@
 """
-Creates a multi-variate linear model of RPM and MPH to predict MPG.
+Creates a multi-variate linear model of weather and MPH to predict MPG.
 """
 import numpy as np
 import pandas as pd
@@ -10,15 +10,15 @@ from sklearn.metrics import r2_score, mean_squared_error
 from .load_data import load_data
 
 
-def make_mpg_rpm_linear_model():
+def make_mpg_weather_linear_model():
     """
-    Creates a multi-variate linear model of RPM and MPH to predict MPG and plots it.
+    Creates a multi-variate linear model of weather and MPH to predict MPG and plots it.
     """
     data = load_data()
-    data = data[["Speed (OBD)(mph)", "Miles Per Gallon(Instant)(mpg)", "Engine RPM(rpm)"]]
+    data = data[["Speed (OBD)(mph)", "Miles Per Gallon(Instant)(mpg)", "Temperature (°C)"]]
     data = data.apply(pd.to_numeric, errors='coerce')
     data = data.dropna()
-    data = data[(data["Miles Per Gallon(Instant)(mpg)"] < 512) & (data["Engine RPM(rpm)"] < 8000)]
+    data = data[(data["Miles Per Gallon(Instant)(mpg)"] < 512) & (data["Temperature (°C)"] < 8000)]
 
     # Group and average hist_data
     data = data.groupby("Speed (OBD)(mph)").mean().reset_index()
@@ -27,7 +27,7 @@ def make_mpg_rpm_linear_model():
     data["sqrt_speed"] = np.sqrt(data["Speed (OBD)(mph)"])
 
     # Define x (sqrt(speed) and RPM) and y (MPG)
-    x = data[["sqrt_speed", "Engine RPM(rpm)"]].values
+    x = data[["sqrt_speed", "Temperature (°C)"]].values
     y = data["Miles Per Gallon(Instant)(mpg)"].values
 
     # Train a multiple linear regression model
@@ -36,8 +36,7 @@ def make_mpg_rpm_linear_model():
     # Get coefficients and intercept
     coefficients = model.coef_
     intercept = model.intercept_
-    print("RPM + speed")
-    print(f"Coefficients: sqrt(Speed): {coefficients[0]:.4f}, RPM: {coefficients[1]:.4f}")
+    print(f"Coefficients: sqrt(Speed): {coefficients[0]:.4f}, Weather: {coefficients[1]:.4f}")
     print(f"Intercept: {intercept:.4f}")
 
     # Make predictions for MPG
@@ -48,6 +47,7 @@ def make_mpg_rpm_linear_model():
     mse = mean_squared_error(y, y_pred)
 
     # Print model performance
+    print("Weather + speed model")
     print(f"R² Score: {r2:.4f}")
     print(f"Mean Squared Error: {mse:.4f}\n")
 
@@ -57,7 +57,7 @@ def make_mpg_rpm_linear_model():
     plt.scatter(data["Speed (OBD)(mph)"], y_pred, color='red', label="Predicted MPG", alpha=0.5)
     plt.xlabel("Speed (mph)")
     plt.ylabel("Miles Per Gallon (mpg)")
-    plt.title("Predicted vs Actual MPG (Using sqrt(Speed) and RPM)")
+    plt.title("Predicted vs Actual MPG (Using sqrt(Speed) and weather)")
     plt.legend()
     plt.grid(True)
-    plt.savefig("figures/sqrt_speed_rpm_vs_mpg_multiregression_model.png")
+    plt.savefig("figures/sqrt_speed_weather_vs_mpg_multiregression_model.png")

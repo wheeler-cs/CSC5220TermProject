@@ -37,6 +37,7 @@ def make_mpg_linear_model():
     model.fit(x, y)
     m = model.coef_[0]
     b = model.intercept_
+    print("Speed-only model")
     print(f"m: {m}\n"
           f"b: {b}")
 
@@ -49,7 +50,7 @@ def make_mpg_linear_model():
 
     # Print model performance
     print(f"R² Score: {r2:.4f}")
-    print(f"Mean Squared Error: {mse:.4f}")
+    print(f"Mean Squared Error: {mse:.4f}\n")
 
     # Plot actual vs. predicted MPG
     plt.figure(figsize=(10, 5))
