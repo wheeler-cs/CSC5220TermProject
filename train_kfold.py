@@ -22,7 +22,7 @@ SEQUENCE_LENGTH = 10
 dataset = VehicleDataset(DATA_DIR, sequence_length=SEQUENCE_LENGTH, do_weather=True)
 
 # Hyperparameters to search
-hidden_sizes = [8, 16, 32, 64, 128, 256]
+hidden_sizes = [32, 64, 128, 256]
 num_layers_list = [2, 4, 6]
 K_FOLDS = 5
 
@@ -111,7 +111,7 @@ for hidden_size in hidden_sizes:
 
 # Save stats to CSV
 stats_df = pd.DataFrame(stats_records)
-stats_df.to_csv("training_stats_weather.csv", index=False)
+stats_df.to_csv("training_stats_smooth_weather.csv", index=False)
 end = time.perf_counter()
 print(f"Best model: "
       f"hidden_size={best_params[0]}, "

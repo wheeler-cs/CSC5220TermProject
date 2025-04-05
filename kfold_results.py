@@ -29,3 +29,6 @@ if __name__ == '__main__':
     print("-" * 30)
     print("Weather data:")
     find_best("training_stats_weather.csv")
+    print("-" * 30)
+    print("Smoothed weather data:")
+    find_best("training_stats_smooth_weather.csv")
