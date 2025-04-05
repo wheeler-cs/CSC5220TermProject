@@ -1,6 +1,7 @@
 """
 Creates histograms of various variables
 """
+import multiprocessing
 import os
 import re
 from typing import Tuple
@@ -40,9 +41,11 @@ def create_histogram(
     plt.close()
 
 
-def make_histograms():
+def make_histograms(pool: multiprocessing.Pool) -> None:
     """
-    Creates histograms of various variables
+    Creates histograms of various variables.
+    :param pool: The global multiprocessing pool to distribute the work of creating the histograms.
+    :returns: None.
     """
     data = load_data()
     data["Temperature (°F)"] = data["Temperature (°C)"] * 9 / 5 + 32
@@ -72,10 +75,10 @@ def make_histograms():
         # Sanitize hist_filename: lowercase, replace spaces with underscores, remove special chars
         sanitized = re.sub(r'\W', '', col).replace('_', '').lower()
         filename = f"figures/histogram_{sanitized}.png"
-        create_histogram(data, col, filename)
+        pool.apply_async(create_histogram, args=(data, col, filename,))
 
     # Pull out fuel used separately due to its outliers.
     sanitized = re.sub(r'\W', '', "Fuel used (inst)").replace('_', '').lower()
     filename = f"figures/histogram_{sanitized}.png"
     fuel_used_df = data[data["Fuel used (inst)"] < 0.0028]
-    create_histogram(fuel_used_df, "Fuel used (inst)", filename, size=(10, 10))
+    pool.apply_async(create_histogram, args=(fuel_used_df, "Fuel used (inst)", filename, (10, 10),))

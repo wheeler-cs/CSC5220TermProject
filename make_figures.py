@@ -4,7 +4,7 @@ Make all the figures
 import multiprocessing
 import time
 from make_figures.altitude_vs_mpg import make_altitude_plot
-from make_figures.g_calibrated_vs_mpg import make_g_calibrated_mpg_plot
+from make_figures.g_vs_mpg import make_g_mpg_plot
 from make_figures.histograms import make_histograms
 from make_figures.intake_air_temp_mpg import make_intake_air_temp_mpg
 from make_figures.mpg_rpm_speed_linear_model import make_mpg_rpm_linear_model
@@ -20,8 +20,6 @@ if __name__ == '__main__':
     start = time.perf_counter()
     functions = [
         make_altitude_plot,
-        make_g_calibrated_mpg_plot,
-        make_histograms,
         make_intake_air_temp_mpg,
         make_mpg_rpm_linear_model,
         make_mpg_linear_model,
@@ -36,9 +34,16 @@ if __name__ == '__main__':
 
     # Make the figures
     # pylint: disable=consider-using-with
-    pool = multiprocessing.Pool(processes=8)
+    pool = multiprocessing.Pool(processes=multiprocessing.cpu_count())
+
+    # Add the single-thread plots
     for func in functions:
         pool.apply_async(func)
+
+    # Add plots that use the pool
+    make_g_mpg_plot(pool)
+    make_histograms(pool)
+
     pool.close()
     pool.join()
     end = time.perf_counter()
