@@ -196,8 +196,19 @@ if __name__ == '__main__':
             if (x := max(df["Fuel used (inst)"])) > max_fuel_used:
                 max_fuel_used = x
 
+            # Drop columns without time.
             df = df[df["GPS Time"] != '-']
             df.reset_index()
+
+            # Calculate the grade (slope) of the road.
+            df = df[df["Altitude"] != "-"]
+            df["Altitude"] = df["Altitude"].apply(pd.to_numeric, errors='coerce')
+            df["Speed (OBD)(mph)"] = df["Speed (OBD)(mph)"].apply(pd.to_numeric, errors='coerce')
+            df.reset_index()
+            df["Grade"] = (
+                    (df["Altitude"].diff() * 3.280839895) /  # Δm -> Δft
+                    (df["Speed (OBD)(mph)"] * 5280 / 3600)   # MPH -> ft/s
+            )
 
             df = add_weather(df)
 
