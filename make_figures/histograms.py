@@ -7,6 +7,7 @@ import re
 from typing import Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 # pylint: disable=relative-beyond-top-level
 from .load_data import load_data
 
@@ -51,6 +52,7 @@ def make_histograms(pool: multiprocessing.Pool) -> None:
     data["Temperature (°F)"] = data["Temperature (°C)"] * 9 / 5 + 32
     data["Speed (OBD)(kph)"] = data["Speed (OBD)(mph)"] * 1.609344
     columns_to_plot = [
+        "Grade",
         "Intake Air Temperature(°F)",
         "Miles Per Gallon(Instant)(mpg)",
         "Speed (OBD)(kph)",
@@ -70,6 +72,9 @@ def make_histograms(pool: multiprocessing.Pool) -> None:
 
     # Convert temperature to integer
     data["Intake Air Temperature(°F)"] = data["Intake Air Temperature(°F)"].astype(int)
+
+    # Round the grade to the nearest % for grouping
+    data["Grade"] = np.round(data["Grade"], decimals=2)
 
     for col in columns_to_plot:
         # Sanitize hist_filename: lowercase, replace spaces with underscores, remove special chars
