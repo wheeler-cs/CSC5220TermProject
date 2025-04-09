@@ -205,10 +205,20 @@ if __name__ == '__main__':
             df["Altitude"] = df["Altitude"].apply(pd.to_numeric, errors='coerce')
             df["Speed (OBD)(mph)"] = df["Speed (OBD)(mph)"].apply(pd.to_numeric, errors='coerce')
             df.reset_index()
+            # We calculate the change in altitude (rise) for the second,
+            # converting to feet.
+            # Then we find the distance for the past second with the speed,
+            # converting to ft/s.
+            # Divide the rise by the run to get the ratio representing grade.
             df["Grade"] = (
                     (df["Altitude"].diff() * 3.280839895) /  # Δm -> Δft
                     (df["Speed (OBD)(mph)"] * 5280 / 3600)   # MPH -> ft/s
             )
+            df["Grade"] = df["Grade"].fillna(0)
+            # Filter outliers.
+            # Grade shouldn't be more than about 12% (0.12),
+            # but that is still an outlier for this data.
+            df["Grade"] = df["Grade"].clip(lower=-0.12, upper=0.12)
 
             df = add_weather(df)
 

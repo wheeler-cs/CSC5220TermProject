@@ -1,6 +1,7 @@
 """
 Plots grade against MPG
 """
+import numpy as np
 import pandas as pd
 # pylint: disable=relative-beyond-top-level
 from .basic_plot import basic_plot
@@ -17,11 +18,8 @@ def make_grade_mpg_plot():
     data = data.dropna()
     data = data[data["Miles Per Gallon(Instant)(mpg)"] < 512]
 
-    # Convert grade to an integer for better grouping
-    data["Grade"] = data["Grade"].astype(int)
-
-    # Filter outliers
-    data = data[(data["Grade"] < -20) & (data["Grade"] < 20)]
+    # Round the grade to the nearest % for grouping
+    data["Grade"] = np.round(data["Grade"], decimals=2)
 
     # Group by speed and compute average MPG
     grouped = data.groupby("Grade")["Miles Per Gallon(Instant)(mpg)"].mean()
@@ -30,8 +28,8 @@ def make_grade_mpg_plot():
         grouped.index,
         grouped.values,
         "Average MPG",
-        "Grade (Δft)",
+        "Grade (Δft/ft)",
         "Average Miles Per Gallon (mpg)",
-        "Grade (Δft) vs. MPG",
+        "Grade (Δft/ft) vs. MPG",
         "figures/grade_vs_mpg.png"
     )
