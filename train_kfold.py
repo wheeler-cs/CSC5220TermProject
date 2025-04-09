@@ -27,7 +27,7 @@ num_layers_list = [2, 4, 6]
 K_FOLDS = 5
 
 # Define model parameters
-INPUT_SIZE = 9  # Number of input features
+INPUT_SIZE = 10  # Number of input features
 OUTPUT_SIZE = 2  # Predicting 2 variables
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -89,8 +89,8 @@ for hidden_size in hidden_sizes:
                 if r2 > best_epoch_r2:
                     best_epoch_r2 = r2
                     best_epoch_stats = {
-                        "HIDDEN_SIZE": hidden_size,
-                        "NUM_LAYERS": num_layers,
+                        "hidden_size": hidden_size,
+                        "num_layers": num_layers,
                         "fold": fold + 1,
                         "epoch": epoch + 1,
                         "r2": r2,
@@ -111,7 +111,7 @@ for hidden_size in hidden_sizes:
 
 # Save stats to CSV
 stats_df = pd.DataFrame(stats_records)
-stats_df.to_csv("training_stats_smooth_weather.csv", index=False)
+stats_df.to_csv("training_stats_smooth_weather_grade.csv", index=False)
 end = time.perf_counter()
 print(f"Best model: "
       f"hidden_size={best_params[0]}, "

@@ -44,7 +44,7 @@ class VehicleDataset(Dataset):
         input_features = [
             "Altitude", "Bearing", "Air Fuel Ratio(Measured)(:1)",
             "Engine Load(%)", "Engine RPM(rpm)", "Intake Air Temperature(°F)",
-            "Relative Throttle Position(%)", "Speed (OBD)(mph)"
+            "Relative Throttle Position(%)", "Speed (OBD)(mph)", "Grade"
         ]
         if self.do_weather:
             input_features.append("Temperature (°C)")
