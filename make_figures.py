@@ -5,7 +5,7 @@ import multiprocessing
 import time
 from make_figures.afr_vs_mpg import make_afr_mpg_plot
 from make_figures.altitude_vs_mpg import make_altitude_plot
-from make_figures.bearing_vs_mpg import make_bearing_mpg_plot
+from make_figures.bearing_vs_mpg import make_bearing_mpg_plot, make_bearing_rate_mpg_plot
 from make_figures.g_vs_mpg import make_g_mpg_plot
 from make_figures.grade_vs_mpg import make_grade_mpg_plot
 from make_figures.histograms import make_histograms
@@ -26,6 +26,7 @@ if __name__ == '__main__':
         make_afr_mpg_plot,
         make_altitude_plot,
         make_bearing_mpg_plot,
+        make_bearing_rate_mpg_plot,
         make_grade_mpg_plot,
         make_intake_air_temp_mpg,
         make_mpg_rpm_linear_model,
