@@ -52,6 +52,7 @@ def make_histograms(pool: multiprocessing.Pool) -> None:
     data["Temperature (°F)"] = data["Temperature (°C)"] * 9 / 5 + 32
     data["Speed (OBD)(kph)"] = data["Speed (OBD)(mph)"] * 1.609344
     columns_to_plot = [
+        "Air Fuel Ratio(Measured)(:1)",
         "Grade",
         "Intake Air Temperature(°F)",
         "Miles Per Gallon(Instant)(mpg)",

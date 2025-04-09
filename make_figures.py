@@ -3,6 +3,7 @@ Make all the figures
 """
 import multiprocessing
 import time
+from make_figures.afr_vs_mpg import make_afr_mpg_plot
 from make_figures.altitude_vs_mpg import make_altitude_plot
 from make_figures.bearing_vs_mpg import make_bearing_mpg_plot
 from make_figures.g_vs_mpg import make_g_mpg_plot
@@ -22,6 +23,7 @@ from make_figures.weather_versus_intake_air import make_weather_intake_air_fahre
 if __name__ == '__main__':
     start = time.perf_counter()
     functions = [
+        make_afr_mpg_plot,
         make_altitude_plot,
         make_bearing_mpg_plot,
         make_grade_mpg_plot,
