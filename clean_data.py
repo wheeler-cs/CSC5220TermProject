@@ -219,6 +219,9 @@ if __name__ == '__main__':
             # Grade shouldn't be more than about 12% (0.12),
             # but that is still an outlier for this data.
             df["Grade"] = df["Grade"].clip(lower=-0.12, upper=0.12)
+            # Take the derivative of "Grade"
+            df["Grade Break"] = df["Grade"].diff()
+            df["Grade Break"] = df["Grade Break"].fillna(0)
 
             df = add_weather(df)
 
