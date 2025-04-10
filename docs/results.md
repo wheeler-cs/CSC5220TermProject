@@ -1,6 +1,52 @@
+# Statistical Models
+
+## Linear Models
+
+All of these models are linear and based on the average of their parameters.
+They each also have corresponding figures to visualize their predictions.
+If applied to the actual data, they would completely fall apart.
+
+Speed-only model:
+```
+m: 6.306035672305798
+b: 4.331039231200869
+R² Score: 0.6683
+Mean Squared Error: 93.7981
+```
+
+Interpretation: Speed (sqrt(MPH)) and MPG are closely correlated,
+making speed a good predictor of MPG.
+
+RPM + speed:
+```
+Coefficients: sqrt(Speed): 6.8400, RPM: -0.0022
+Intercept: 4.7100
+R² Score: 0.6672
+Mean Squared Error: 94.1096
+```
+
+Interpretation: Combining speed (sqrt(MPH)) and RPM does not, on average, 
+make a better predictor than speed alone.
+
+Weather + speed model:
+```
+Coefficients: sqrt(Speed): 7.2855, Weather: -1.2473:
+Intercept: 20.2941
+R² Score: 0.6864
+Mean Squared Error: 88.6874
+```
+
+Interpretation: Combining speed (sqrt(MPH)) with weather data makes for a 
+better predictor of MPG than speed alone.
+
+
 # Cross-Validation Results
 
-K-fold cross-validation with 8 parameters
+For each run, the results are:
+
+(Best of measure): hidden size, num layers; R²; MAE
+
+## K-fold cross-validation with 8 parameters
 
 ```
 "Altitude", "Bearing", "Air Fuel Ratio(Measured)(:1)",
@@ -21,7 +67,7 @@ Min MAE: 128, 4; R² 0.466164; MAE 0.009175
 
 ---
 
-K-fold cross-validation with 9 parameters
+## K-fold cross-validation with 9 parameters
 
 ```
 "Altitude", "Bearing", "Air Fuel Ratio(Measured)(:1)",
@@ -40,10 +86,21 @@ Max R²: 64, 2; R² 0.479795; MAE 0.009746
 
 Min MAE: 128, 4; R² 0.454165; MAE 0.009142
 
+Adding weather data makes a minor improvement to accuracy, but correlates less
+than without it.
+
 ---
 
-Ditto, but smoothed weather data and dropping `hidden_sizes` 
-8 and 16 since they were too small.
+## Smoothed Weather Data
+
+Smoothed weather data and dropping `hidden_sizes` 8 and 16 since they were 
+too small to perform well.
+
+```
+"Altitude", "Bearing", "Air Fuel Ratio(Measured)(:1)",
+"Engine Load(%)", "Engine RPM(rpm)", "Intake Air Temperature(°F)",
+"Relative Throttle Position(%)", "Speed (OBD)(mph)", "Temperature (°C)"
+```
 
 ```
 Best model: hidden_size=64, num_layers=2 with R²=0.4815
@@ -56,9 +113,18 @@ Max R²: 64, 2; R² 0.481467; MAE 0.009898
 
 Min MAE: 128, 4; R² 0.456551; MAE 0.008981
 
+Smoothing the weather data makes the model correlate better than not, but 
+makes accuracy have a greater range for the given parameters.
+
 ---
 
-Ditto, adding grade
+## Smoothed Weather Data + Grade
+
+```
+"Altitude", "Bearing", "Air Fuel Ratio(Measured)(:1)",
+"Engine Load(%)", "Engine RPM(rpm)", "Intake Air Temperature(°F)",
+"Relative Throttle Position(%)", "Speed (OBD)(mph)", "Temperature (°C)", "Grade"
+```
 
 ```
 Best model: hidden_size=256, num_layers=2 with R²=0.6227
@@ -70,3 +136,10 @@ Time: 41400.673085853s
 Max R²: 256, 2; R² 0.622700; MAE 0.011587
 
 Min MAE: 128, 4; R² 0.505697; MAE 0.010199
+
+Adding grade (the slope of the road) increases the correlation of the model 
+with the actual data, but increases error once more. 
+Considering this model is intended for comparison, this correlation is more 
+important if the model is consistent (precision). 
+Furthermore, if the total fuel used is close to the actual value (overall 
+accuracy), that is more  important than being accurate for a given data point.
