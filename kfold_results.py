@@ -78,12 +78,22 @@ def plot_results() -> None:
     plot_heatmap(no_weather, 'r2', "No Weather Data", "figures/no_weather_r2.png")
     plot_heatmap(weather, 'r2', "Weather Data", "figures/weather_r2.png")
     plot_heatmap(smooth_weather, 'r2', "Smoothed Weather Data", "figures/smoothed_weather_r2.png")
-    plot_heatmap(grade, 'r2', "Smoothed Weather Data + Grade", "figures/smoothed_weather_grade_r2.png")
+    plot_heatmap(
+        grade,
+        'r2',
+        "Smoothed Weather Data + Grade",
+        "figures/smoothed_weather_grade_r2.png"
+    )
 
     plot_heatmap(no_weather, 'mae', "No Weather Data", "figures/no_weather_mae.png")
     plot_heatmap(weather, 'mae', "Weather Data", "figures/weather_mae.png")
     plot_heatmap(smooth_weather, 'mae', "Smoothed Weather Data", "figures/smoothed_weather_mae.png")
-    plot_heatmap(grade, 'mae', "Smoothed Weather Data + Grade", "figures/smoothed_weather_grade_mae.png")
+    plot_heatmap(
+        grade,
+        'mae',
+        "Smoothed Weather Data + Grade",
+        "figures/smoothed_weather_grade_mae.png"
+    )
 
 
 if __name__ == '__main__':
