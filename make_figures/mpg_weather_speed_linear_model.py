@@ -36,6 +36,7 @@ def make_mpg_weather_linear_model():
     # Get coefficients and intercept
     coefficients = model.coef_
     intercept = model.intercept_
+    print("Weather + speed model")
     print(f"Coefficients: sqrt(Speed): {coefficients[0]:.4f}, Weather: {coefficients[1]:.4f}")
     print(f"Intercept: {intercept:.4f}")
 
@@ -47,7 +48,6 @@ def make_mpg_weather_linear_model():
     mse = mean_squared_error(y, y_pred)
 
     # Print model performance
-    print("Weather + speed model")
     print(f"R² Score: {r2:.4f}")
     print(f"Mean Squared Error: {mse:.4f}\n")
 
