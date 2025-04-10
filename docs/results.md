@@ -50,6 +50,23 @@ Best model: hidden_size=64, num_layers=2 with R²=0.4815
 Time: 39132.050840361975s
 ```
 
+(10.87 hours)
+
 Max R²: 64, 2; R² 0.481467; MAE 0.009898
 
 Min MAE: 128, 4; R² 0.456551; MAE 0.008981
+
+---
+
+Ditto, adding grade
+
+```
+Best model: hidden_size=256, num_layers=2 with R²=0.6227
+Time: 41400.673085853s
+```
+
+(11.5 hours)
+
+Max R²: 256, 2; R² 0.622700; MAE 0.011587
+
+Min MAE: 128, 4; R² 0.505697; MAE 0.010199

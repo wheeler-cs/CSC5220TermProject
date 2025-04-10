@@ -53,9 +53,10 @@ def plot_results() -> None:
     no_weather = pd.read_csv("./training_stats_no_weather.csv")
     weather = pd.read_csv("./training_stats_weather.csv")
     smooth_weather = pd.read_csv("./training_stats_smooth_weather.csv")
+    grade = pd.read_csv("./training_stats_smooth_weather_grade.csv")
 
     # Strip column names and ensure numeric data
-    for df in [no_weather, weather, smooth_weather]:
+    for df in [no_weather, weather, smooth_weather, grade]:
         df.columns = df.columns.str.strip()
         df[df.columns] = df.apply(pd.to_numeric, errors='coerce')
 
@@ -71,15 +72,18 @@ def plot_results() -> None:
     no_weather = process(no_weather)
     weather = process(weather)
     smooth_weather = process(smooth_weather)
+    grade = process(grade)
 
     # Generate plots
     plot_heatmap(no_weather, 'r2', "No Weather Data", "figures/no_weather_r2.png")
     plot_heatmap(weather, 'r2', "Weather Data", "figures/weather_r2.png")
     plot_heatmap(smooth_weather, 'r2', "Smoothed Weather Data", "figures/smoothed_weather_r2.png")
+    plot_heatmap(grade, 'r2', "Smoothed Weather Data + Grade", "figures/smoothed_weather_grade_r2.png")
 
     plot_heatmap(no_weather, 'mae', "No Weather Data", "figures/no_weather_mae.png")
     plot_heatmap(weather, 'mae', "Weather Data", "figures/weather_mae.png")
     plot_heatmap(smooth_weather, 'mae', "Smoothed Weather Data", "figures/smoothed_weather_mae.png")
+    plot_heatmap(grade, 'mae', "Smoothed Weather Data + Grade", "figures/smoothed_weather_grade_mae.png")
 
 
 if __name__ == '__main__':
@@ -91,6 +95,9 @@ if __name__ == '__main__':
     print("-" * 30)
     print("Smoothed weather data:")
     find_best("training_stats_smooth_weather.csv")
+    print("-" * 30)
+    print("Smoothed weather data + grade:")
+    find_best("training_stats_smooth_weather_grade.csv")
 
     # Plot the results of the k-fold cross-validation
     plot_results()
