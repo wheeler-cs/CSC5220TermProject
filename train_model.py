@@ -19,7 +19,7 @@ from data_loading.vehicle_dataset import VehicleDataset
 # Load dataset
 DATA_DIR = "cleaned_data"
 SEQUENCE_LENGTH = 10
-dataset = VehicleDataset(DATA_DIR, sequence_length=SEQUENCE_LENGTH)
+dataset = VehicleDataset(DATA_DIR, sequence_length=SEQUENCE_LENGTH, do_weather=True)
 train_size = int(0.8 * len(dataset))
 val_size = len(dataset) - train_size
 train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
@@ -28,10 +28,10 @@ dataloader_train = DataLoader(train_dataset, batch_size=128, shuffle=True)
 dataloader_val = DataLoader(val_dataset, batch_size=128, shuffle=False)
 
 # Define model parameters
-INPUT_SIZE = 8  # Number of input features
-HIDDEN_SIZE = 8
-NUM_LAYERS = 4
-OUTPUT_SIZE = 2  # Predicting 2 variables
+INPUT_SIZE = 10  # Number of input features
+HIDDEN_SIZE = 64
+NUM_LAYERS = 6
+OUTPUT_SIZE = 1  # Predicting 1 variable
 
 print(f"Params\n"
       f"{INPUT_SIZE=}\n"

@@ -28,7 +28,7 @@ K_FOLDS = 5
 
 # Define model parameters
 INPUT_SIZE = 10  # Number of input features
-OUTPUT_SIZE = 1  # Predicting 2 variables
+OUTPUT_SIZE = 1  # Predicting 1 variable
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # K-Fold Cross-Validation
