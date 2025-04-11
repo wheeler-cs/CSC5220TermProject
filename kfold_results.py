@@ -54,9 +54,10 @@ def plot_results() -> None:
     weather = pd.read_csv("./training_stats_weather.csv")
     smooth_weather = pd.read_csv("./training_stats_smooth_weather.csv")
     grade = pd.read_csv("./training_stats_smooth_weather_grade.csv")
+    fuel_only = pd.read_csv("./training_stats_smooth_weather_grade_fuel_only.csv")
 
     # Strip column names and ensure numeric data
-    for df in [no_weather, weather, smooth_weather, grade]:
+    for df in [no_weather, weather, smooth_weather, grade, fuel_only]:
         df.columns = df.columns.str.strip()
         df[df.columns] = df.apply(pd.to_numeric, errors='coerce')
 
@@ -73,26 +74,69 @@ def plot_results() -> None:
     weather = process(weather)
     smooth_weather = process(smooth_weather)
     grade = process(grade)
+    fuel_only = process(fuel_only)
 
     # Generate plots
-    plot_heatmap(no_weather, 'r2', "No Weather Data", "figures/no_weather_r2.png")
-    plot_heatmap(weather, 'r2', "Weather Data", "figures/weather_r2.png")
-    plot_heatmap(smooth_weather, 'r2', "Smoothed Weather Data", "figures/smoothed_weather_r2.png")
+    plot_heatmap(
+        no_weather,
+        'r2',
+        "No Weather Data",
+        "figures/no_weather_r2.png"
+    )
+    plot_heatmap(
+        weather,
+        'r2',
+        "Weather Data",
+        "figures/weather_r2.png"
+    )
+    plot_heatmap(
+        smooth_weather,
+        'r2',
+        "Smoothed Weather Data",
+        "figures/smoothed_weather_r2.png"
+    )
     plot_heatmap(
         grade,
         'r2',
         "Smoothed Weather Data + Grade",
         "figures/smoothed_weather_grade_r2.png"
     )
+    plot_heatmap(
+        fuel_only,
+        'r2',
+        "Smoothed Weather Data + Grade; Fuel Only",
+        "figures/smoothed_weather_grade_fuel_only_r2.png"
+    )
 
-    plot_heatmap(no_weather, 'mae', "No Weather Data", "figures/no_weather_mae.png")
-    plot_heatmap(weather, 'mae', "Weather Data", "figures/weather_mae.png")
-    plot_heatmap(smooth_weather, 'mae', "Smoothed Weather Data", "figures/smoothed_weather_mae.png")
+    plot_heatmap(
+        no_weather,
+        'mae',
+        "No Weather Data",
+        "figures/no_weather_mae.png"
+    )
+    plot_heatmap(
+        weather,
+        'mae',
+        "Weather Data",
+        "figures/weather_mae.png"
+    )
+    plot_heatmap(
+        smooth_weather,
+        'mae',
+        "Smoothed Weather Data",
+        "figures/smoothed_weather_mae.png"
+    )
     plot_heatmap(
         grade,
         'mae',
         "Smoothed Weather Data + Grade",
         "figures/smoothed_weather_grade_mae.png"
+    )
+    plot_heatmap(
+        fuel_only,
+        'mae',
+        "Smoothed Weather Data + Grade; Fuel Only",
+        "figures/smoothed_weather_grade_fuel_only_mae.png"
     )
 
 
@@ -106,8 +150,11 @@ if __name__ == '__main__':
     print("Smoothed weather data:")
     find_best("training_stats_smooth_weather.csv")
     print("-" * 30)
-    print("Smoothed weather data + grade:")
+    print("Smoothed weather data + Grade:")
     find_best("training_stats_smooth_weather_grade.csv")
+    print("-" * 30)
+    print("Smoothed weather data + Grade; Fuel only:")
+    find_best("training_stats_smooth_weather_grade_fuel_only.csv")
 
     # Plot the results of the k-fold cross-validation
     plot_results()

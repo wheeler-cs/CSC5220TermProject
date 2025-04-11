@@ -48,7 +48,7 @@ class VehicleDataset(Dataset):
         ]
         if self.do_weather:
             input_features.append("Temperature (°C)")
-        target_features = ["Miles Per Gallon(Instant)(mpg)", "Fuel used (inst)"]
+        target_features = ["Fuel used (inst)"]  # "Miles Per Gallon(Instant)(mpg)",
         all_features = input_features + target_features
         # Extract only what we want
         data = data[all_features]

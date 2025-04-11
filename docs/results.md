@@ -142,4 +142,27 @@ with the actual data, but increases error once more.
 Considering this model is intended for comparison, this correlation is more 
 important if the model is consistent (precision). 
 Furthermore, if the total fuel used is close to the actual value (overall 
-accuracy), that is more  important than being accurate for a given data point.
+accuracy), that is more important than being accurate for a given data point.
+
+## Smoothed Weather Data + Grade; Fuel Used Only
+
+```
+"Altitude", "Bearing", "Air Fuel Ratio(Measured)(:1)",
+"Engine Load(%)", "Engine RPM(rpm)", "Intake Air Temperature(°F)",
+"Relative Throttle Position(%)", "Speed (OBD)(mph)", "Temperature (°C)", "Grade"
+```
+
+```
+Best model: hidden_size=64, num_layers=6 with R²=0.8794
+Time: 41673.575881013s
+```
+
+(~11.58 hours)
+
+Max R²: 64, 6; R² 0.879393; MAE 0.001266
+
+Min MAE: 64, 6; R² 0.879393; MAE 0.001266
+
+Fuel economy and fuel used are inversely correlated, 
+so the idea was to predict fuel used only and calculate the fuel economy.
+The result was an order of magnitude less error and much better R².

@@ -28,7 +28,7 @@ K_FOLDS = 5
 
 # Define model parameters
 INPUT_SIZE = 10  # Number of input features
-OUTPUT_SIZE = 2  # Predicting 2 variables
+OUTPUT_SIZE = 1  # Predicting 2 variables
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # K-Fold Cross-Validation
@@ -111,7 +111,7 @@ for hidden_size in hidden_sizes:
 
 # Save stats to CSV
 stats_df = pd.DataFrame(stats_records)
-stats_df.to_csv("training_stats_smooth_weather_grade.csv", index=False)
+stats_df.to_csv("training_stats_smooth_weather_grade_fuel_only.csv", index=False)
 end = time.perf_counter()
 print(f"Best model: "
       f"hidden_size={best_params[0]}, "
