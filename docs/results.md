@@ -166,3 +166,26 @@ Min MAE: 64, 6; R² 0.879393; MAE 0.001266
 Fuel economy and fuel used are inversely correlated, 
 so the idea was to predict fuel used only and calculate the fuel economy.
 The result was an order of magnitude less error and much better R².
+
+---
+
+## Smoothed Weather Data + Grade; Fuel Used Only; No Bearing
+
+```
+"Altitude", "Air Fuel Ratio(Measured)(:1)",
+"Engine Load(%)", "Engine RPM(rpm)", "Intake Air Temperature(°F)",
+"Relative Throttle Position(%)", "Speed (OBD)(mph)", "Temperature (°C)", "Grade"
+```
+
+```
+Best model: hidden_size=64, num_layers=6 with R²=0.8239
+Time: 40597.803125932s
+```
+
+(~11.28 hours)
+
+Max R²: 64, 4; R² 0.823888; MAE 0.001448
+
+Min MAE: 128, 6; R² 0.820465; MAE 0.001417
+
+Hearing helped a little bit, but had relatively little impact.

@@ -55,9 +55,10 @@ def plot_results() -> None:
     smooth_weather = pd.read_csv("./training_stats_smooth_weather.csv")
     grade = pd.read_csv("./training_stats_smooth_weather_grade.csv")
     fuel_only = pd.read_csv("./training_stats_smooth_weather_grade_fuel_only.csv")
+    no_bearing = pd.read_csv("./training_stats_smooth_weather_grade_fuel_only_no_bearing.csv")
 
     # Strip column names and ensure numeric data
-    for df in [no_weather, weather, smooth_weather, grade, fuel_only]:
+    for df in [no_weather, weather, smooth_weather, grade, fuel_only, no_bearing]:
         df.columns = df.columns.str.strip()
         df[df.columns] = df.apply(pd.to_numeric, errors='coerce')
 
@@ -75,6 +76,7 @@ def plot_results() -> None:
     smooth_weather = process(smooth_weather)
     grade = process(grade)
     fuel_only = process(fuel_only)
+    no_bearing = process(no_bearing)
 
     # Generate plots
     plot_heatmap(
@@ -107,6 +109,12 @@ def plot_results() -> None:
         "Smoothed Weather Data + Grade; Fuel Only",
         "figures/smoothed_weather_grade_fuel_only_r2.png"
     )
+    plot_heatmap(
+        no_bearing,
+        'r2',
+        "Smoothed weather data + Grade; Fuel only; No Bearing",
+        "figures/no_bearing_r2.png"
+    )
 
     plot_heatmap(
         no_weather,
@@ -138,6 +146,12 @@ def plot_results() -> None:
         "Smoothed Weather Data + Grade; Fuel Only",
         "figures/smoothed_weather_grade_fuel_only_mae.png"
     )
+    plot_heatmap(
+        no_bearing,
+        'mae',
+        "Smoothed weather data + Grade; Fuel only; No Bearing",
+        "figures/no_bearing_mae.png"
+    )
 
 
 if __name__ == '__main__':
@@ -155,6 +169,9 @@ if __name__ == '__main__':
     print("-" * 30)
     print("Smoothed weather data + Grade; Fuel only:")
     find_best("training_stats_smooth_weather_grade_fuel_only.csv")
+    print("-" * 30)
+    print("Smoothed weather data + Grade; Fuel only; No Bearing:")
+    find_best("training_stats_smooth_weather_grade_fuel_only_no_bearing.csv")
 
     # Plot the results of the k-fold cross-validation
     plot_results()
