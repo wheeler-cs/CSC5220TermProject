@@ -42,7 +42,7 @@ class VehicleDataset(Dataset):
 
         # Select relevant input features and target variables
         input_features = [
-            "Altitude", "Air Fuel Ratio(Measured)(:1)",
+            "Altitude", "Bearing", "Air Fuel Ratio(Measured)(:1)",
             "Engine Load(%)", "Engine RPM(rpm)", "Intake Air Temperature(°F)",
             "Relative Throttle Position(%)", "Speed (OBD)(mph)", "Grade"
         ]
