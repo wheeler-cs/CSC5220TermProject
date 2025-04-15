@@ -1,4 +1,8 @@
+"""
+Dataset class for vehicle fuel economy hist_data.
+"""
 import os
+from typing import Tuple, Optional
 
 import numpy as np
 import pandas as pd
@@ -11,18 +15,20 @@ class VehicleDataset(Dataset):
     Dataset class for vehicle fuel economy hist_data.
     """
 
-    def __init__(self, data_dir, sequence_length=30):
+    def __init__(self, data_dir, sequence_length: int = 30, do_weather: bool = False):
         """
         :param data_dir: The directory with the cleaned fuel economy hist_data.
         :param sequence_length: The size of the prediction being done.
+        :param do_weather: Whether to add weather data.
         """
         self.sequence_length = sequence_length
+        self.do_weather = do_weather
+        self.fuel_range: Optional[Tuple[int, int]] = None
         self.data = self.load_data(data_dir)
 
-    @staticmethod
-    def load_data(data_dir):
+    def load_data(self, data_dir):
         """
-        Loads CSV hist_data from `data_dir`
+        Loads CSV hist_data from `DATA_DIR`
         :param data_dir: The directory with the cleaned hist_data CSVs.
         :returns: The numpy arrays of the hist_data.
         """
@@ -40,9 +46,11 @@ class VehicleDataset(Dataset):
         input_features = [
             "Altitude", "Bearing", "Air Fuel Ratio(Measured)(:1)",
             "Engine Load(%)", "Engine RPM(rpm)", "Intake Air Temperature(°F)",
-            "Relative Throttle Position(%)", "Speed (OBD)(mph)"
+            "Relative Throttle Position(%)", "Speed (OBD)(mph)", "Grade"
         ]
-        target_features = ["Miles Per Gallon(Instant)(mpg)", "Fuel used (inst)"]
+        if self.do_weather:
+            input_features.append("Temperature (°C)")
+        target_features = ["Fuel used (inst)"]  # "Miles Per Gallon(Instant)(mpg)",
         all_features = input_features + target_features
         # Extract only what we want
         data = data[all_features]
@@ -54,6 +62,9 @@ class VehicleDataset(Dataset):
         # Drop rows with missing hist_data
         data = data.dropna()
 
+        # Grab the range of fuel used
+        self.fuel_range = data["Fuel used (inst)"].min(), data["Fuel used (inst)"].max()
+
         for column in data.columns:
             # Min-Max Normalize each column.
             data[column] = (
@@ -62,14 +73,20 @@ class VehicleDataset(Dataset):
             )
 
         # Cast to float32 for training
-        X = data[input_features].astype(np.float32).values
+        x = data[input_features].astype(np.float32).values
         y = data[target_features].astype(np.float32).values
-        return X, y
+        return x, y
 
     def __len__(self):
+        """
+        The length of the dataset
+        """
         return len(self.data[0]) - self.sequence_length
 
     def __getitem__(self, idx):
-        X_seq = self.data[0][idx:idx + self.sequence_length]
+        """
+        Get a particular item of the dataset
+        """
+        x_seq = self.data[0][idx:idx + self.sequence_length]
         y_seq = self.data[1][idx + self.sequence_length - 1]  # Predict the last time step
-        return torch.tensor(X_seq), torch.tensor(y_seq)
+        return torch.tensor(x_seq), torch.tensor(y_seq)
