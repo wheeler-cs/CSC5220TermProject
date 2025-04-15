@@ -188,4 +188,4 @@ Max R²: 64, 4; R² 0.823888; MAE 0.001448
 
 Min MAE: 128, 6; R² 0.820465; MAE 0.001417
 
-Hearing helped a little bit, but had relatively little impact.
+Bearing helped a little bit, but had relatively little impact.
