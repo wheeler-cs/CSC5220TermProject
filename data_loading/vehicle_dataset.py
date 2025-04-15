@@ -15,7 +15,7 @@ class VehicleDataset(Dataset):
     Dataset class for vehicle fuel economy hist_data.
     """
 
-    def __init__(self, data_dir, sequence_length=30, do_weather: bool = False):
+    def __init__(self, data_dir, sequence_length: int = 30, do_weather: bool = False):
         """
         :param data_dir: The directory with the cleaned fuel economy hist_data.
         :param sequence_length: The size of the prediction being done.
@@ -23,8 +23,8 @@ class VehicleDataset(Dataset):
         """
         self.sequence_length = sequence_length
         self.do_weather = do_weather
-        self.data = self.load_data(data_dir)
         self.fuel_range: Optional[Tuple[int, int]] = None
+        self.data = self.load_data(data_dir)
 
     def load_data(self, data_dir):
         """

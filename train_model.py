@@ -118,28 +118,28 @@ for epoch in range(EPOCHS):
         torch.save(model, "checkpoint.pth")
     elif r2_train > max_r2_train:
         max_r2_train = r2_train
-        torch.save(model, "checkpoint.pth")
+        torch.save({"state": model.state_dict()}, "checkpoint.pth")
 
 print("Training complete.")
 print(f"GPU time: {GPU_TIME:.4f}s")
 
 # Plot for Trip Average MPG
+# plt.figure(figsize=(8, 5))
+# plt.scatter(all_targets[:, 0], all_preds[:, 0], alpha=0.5, label="Predicted vs. Actual")
+# plt.plot([all_targets[:, 0].min(), all_targets[:, 0].max()],
+#          [all_targets[:, 0].min(), all_targets[:, 0].max()], 'r--')  # Ideal 1:1 line
+# plt.xlabel("Actual Trip Avg MPG")
+# plt.ylabel("Predicted Trip Avg MPG")
+# plt.title("Trip Avg MPG: Predicted vs Actual")
+# plt.legend()
+# plt.grid(True)
+# plt.show()
+
+# Plot for Fuel Used (trip)
 plt.figure(figsize=(8, 5))
 plt.scatter(all_targets[:, 0], all_preds[:, 0], alpha=0.5, label="Predicted vs. Actual")
 plt.plot([all_targets[:, 0].min(), all_targets[:, 0].max()],
          [all_targets[:, 0].min(), all_targets[:, 0].max()], 'r--')  # Ideal 1:1 line
-plt.xlabel("Actual Trip Avg MPG")
-plt.ylabel("Predicted Trip Avg MPG")
-plt.title("Trip Avg MPG: Predicted vs Actual")
-plt.legend()
-plt.grid(True)
-plt.show()
-
-# Plot for Fuel Used (trip)
-plt.figure(figsize=(8, 5))
-plt.scatter(all_targets[:, 1], all_preds[:, 1], alpha=0.5, label="Predicted vs. Actual")
-plt.plot([all_targets[:, 1].min(), all_targets[:, 1].max()],
-         [all_targets[:, 1].min(), all_targets[:, 1].max()], 'r--')  # Ideal 1:1 line
 plt.xlabel("Actual Fuel Used (gal)")
 plt.ylabel("Predicted Fuel Used (gal)")
 plt.title("Fuel Used: Predicted vs Actual")

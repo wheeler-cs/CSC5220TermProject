@@ -189,3 +189,32 @@ Max R²: 64, 4; R² 0.823888; MAE 0.001448
 Min MAE: 128, 6; R² 0.820465; MAE 0.001417
 
 Bearing helped a little bit, but had relatively little impact.
+
+# Final Model
+
+For the final model, we did another training run with what was found to be the
+best set of inputs and hyperparameters. 
+Those were:
+
+Inputs:
+```
+"Altitude", "Air Fuel Ratio(Measured)(:1)",
+"Engine Load(%)", "Engine RPM(rpm)", "Intake Air Temperature(°F)",
+"Relative Throttle Position(%)", "Speed (OBD)(mph)", "Temperature (°C)", "Grade"
+```
+
+Predicting:
+```
+"Fuel used (inst)"
+```
+
+Absolute Errors: 120.255702 gallons
+MAE: 0.000973
+MSE: 0.000003
+R² score: 0.954034
+Sum of Absolute Errors (SAE): 552.438416
+Sum Squared Errors (SSE): 1.800696
+Total difference: 12.568644 gallons, | predicted total - actual total |
+Fuel total: 436.5604 gallons
+Fuel total hat: 449.1081 gallons
+Total error percent: 2.8742%
