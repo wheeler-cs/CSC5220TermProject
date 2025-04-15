@@ -2,6 +2,7 @@
 Dataset class for vehicle fuel economy hist_data.
 """
 import os
+from typing import Tuple, Optional
 
 import numpy as np
 import pandas as pd
@@ -23,6 +24,7 @@ class VehicleDataset(Dataset):
         self.sequence_length = sequence_length
         self.do_weather = do_weather
         self.data = self.load_data(data_dir)
+        self.fuel_range: Optional[Tuple[int, int]] = None
 
     def load_data(self, data_dir):
         """
@@ -59,6 +61,9 @@ class VehicleDataset(Dataset):
         data = data.apply(pd.to_numeric, errors='coerce')
         # Drop rows with missing hist_data
         data = data.dropna()
+
+        # Grab the range of fuel used
+        self.fuel_range = data["Fuel used (inst)"].min(), data["Fuel used (inst)"].max()
 
         for column in data.columns:
             # Min-Max Normalize each column.
