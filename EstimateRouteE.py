@@ -20,33 +20,41 @@ def load_data(data_dir: str = "./cleaned_data") -> List[pd.DataFrame]:
     return dataframes
 
 
-def calculate_duration(data: List[pd.DataFrame]) -> List[datetime.timedelta]:
+def create_estimate_frames(data: List[pd.DataFrame]) -> pd.DataFrame:
     '''
     
     '''
-    durations = []
+    new_dataframe = pd.DataFrame()
     for frame in data:
-        # What a nightmare this is : )
-        start_time = frame["GPS Time"].head(1).iloc(0)[0]
-        end_time   = frame["GPS Time"].tail(1).iloc(0)[0]
-        start_time = start_time.split(' ')
-        parsed_time = start_time[3].split(':')
-        start_time = datetime.datetime(year=int(start_time[5]),
-                                       month=datetime.datetime.strptime(start_time[1], "%b").month,
-                                       day=int(start_time[2]),
+        start_time = gps_time_convert(frame["GPS Time"].head(1).iloc[0])
+        end_time   = gps_time_convert(frame["GPS Time"].tail(1).iloc[0])
+        duration   = end_time - start_time
+        avg_speed  = frame["Speed (OBD)(mph)"].mean()
+        avg_grade  = frame["Grade"].mean()
+        new_data = pd.DataFrame([{"start": start_time,
+                                  "end": end_time,
+                                  "duration": duration,
+                                  "calc_distance": (duration.total_seconds() / 3600) * avg_speed,
+                                  "avg_speed": avg_speed,
+                                  "avg_grade": avg_grade,
+                                  "routee_estimate": 0.0}])
+        new_dataframe = pd.concat([new_dataframe, new_data], ignore_index=True)
+    return new_dataframe
+
+
+def gps_time_convert(gps_time: str) -> datetime.datetime:
+    '''
+    
+    '''
+    parsed_datetime = gps_time.split(' ')
+    parsed_time = parsed_datetime[3].split(':')
+    converted_time = datetime.datetime(year=int(parsed_datetime[5]),
+                                       month=datetime.datetime.strptime(parsed_datetime[1], "%b").month,
+                                       day=int(parsed_datetime[2]),
                                        hour=int(parsed_time[0]),
                                        minute=int(parsed_time[1]),
                                        second=int(parsed_time[2]))
-        end_time = end_time.split(' ')
-        parsed_time = end_time[3].split(':')
-        end_time = datetime.datetime(year=int(end_time[5]),
-                                       month=datetime.datetime.strptime(end_time[1], "%b").month,
-                                       day=int(end_time[2]),
-                                       hour=int(parsed_time[0]),
-                                       minute=int(parsed_time[1]),
-                                       second=int(parsed_time[2]))
-        durations.append(end_time - start_time)
-    return durations
+    return converted_time
 
 
 def get_averages(data: List[pd.DataFrame], parameter: str) -> List[float]:
@@ -67,20 +75,19 @@ def calculate_distance(avg_speeds: List[float], durations: List[datetime.timedel
     return miles
 
 
-
-def make_requests(req: NREL_API.Request, grades: List[float], speeds: List[float], durations: List[datetime.timedelta], time_delay: int = 5) -> List[requests.Response]:
+def make_requests(req: NREL_API.Request, data: pd.DataFrame, time_delay: int = 5) -> pd.DataFrame:
     '''
 
     '''
-    miles = calculate_distance(speeds, durations)
-    text_list = []
-    for i in tqdm(range(0, len(grades)), desc="Requesting RouteE Data"):
+    data["routee_estimate"] = None
+    for i in tqdm(range(len(data)), desc="Contacting RouteE"):
         sleep(time_delay)
-        req.miles = miles[i]
-        req.speed_mph = speeds[i]
-        req.grade_percent = grades[i]
-        text_list.append(req.make_request().text)
-    return(text_list)
+        row = data.iloc[i]
+        req.miles         = row["calc_distance"]
+        req.speed_mph     = row["avg_speed"]
+        req.grade_percent = row["avg_grade"]
+        data.loc[i, "routee_estimate"] = req.make_request().json()["route"][0]["energy_estimate"]
+    return data    
 
 
 
@@ -88,12 +95,9 @@ def make_requests(req: NREL_API.Request, grades: List[float], speeds: List[float
 # ======================================================================================================================
 if __name__ == "__main__":
     dataframes = load_data()
-    grade_averages = get_averages(dataframes, "Grade")
-    speed_averages = get_averages(dataframes, "Speed (OBD)(mph)")
-    durations = calculate_duration(dataframes)
-    req = NREL_API.Request(model="2016_TOYOTA_Corolla_4cyl_2WD", id=1, miles=20, speed_mph=40, grade_percent=10)
+    estimates = create_estimate_frames(dataframes)
+    req = NREL_API.Request(model="2016_TOYOTA_Corolla_4cyl_2WD", id=1, miles=0, speed_mph=0, grade_percent=0)
     req.load_api_key("./RouteE.key")
-    responses = make_requests(req, grade_averages, speed_averages, durations, time_delay=10)
+    estimates = make_requests(req, estimates, time_delay=3)
     with open("estimates.json", 'w') as results:
-        for r in responses:
-            results.write(str(r) + ',')
+        estimates.to_json(results, orient="records", lines=True, indent=4)
